@@ -102,7 +102,7 @@ namespace mastermind_SOFT153
             Console.Write("Time to make your guess...\n\n");
             Console.ResetColor();
 
-            for (int i = 0; i < length; i++)
+            for (int i = 0; i < length; i++)        // Retrieves each number of the guess individually
             {
                 Console.WriteLine("Please enter a value between 1 and {0}: ", range);
                 temp = Convert.ToInt32(Console.ReadLine());
@@ -111,24 +111,31 @@ namespace mastermind_SOFT153
             }
         }
 
+        /// <summary>
+        /// Looks at the players guess and determines how many black pegs and how many white pegs should be given
+        /// </summary>
+        /// <param name="guessedCode"> The code provided by the player </param>
+        /// <param name="hiddenCode"> The code that the player is trying to guess </param>
+        /// <param name="n"> The length of the code </param>
+        /// <param name="isCorrect"> Whether or not the current guess is correct </param>
         static void EvaluatePlayerTurn(int[] guessedCode, int[] hiddenCode, int n, ref bool isCorrect)
         {
-            int b = 0;
+            int b = 0;      // Initialise number of each colour peg
             int w = 0;
 
             Console.Write("\n");
 
-            for (int i = 0; i < n; i++)
+            for (int i = 0; i < n; i++)     // Goes through the entire guessed code one by one
             {
-                if (guessedCode[i] == hiddenCode[i])
+                if (guessedCode[i] == hiddenCode[i])        // If the numbers match, a black peg is awarded
                 {
                     b++;
-                    guessedCode[i] = 0;
+                    guessedCode[i] = 0;     // To prevent the digit being counted again, it is set to 0
                     Console.Write("| Black Peg | ");
                 }
                 else
                 {
-                    for (int j = 0; j < n; j++)
+                    for (int j = 0; j < n; j++)     // Loop through again, this checks to see if the guessed digit is present but in a different location
                     {
                         if (guessedCode[j] == hiddenCode[i])
                         {
@@ -142,13 +149,18 @@ namespace mastermind_SOFT153
 
             Console.Write("\n");
 
-            if (b == n)
+            if (b == n)     // If the number of black pegs equals the length of the code, the player has won
             {
                 isCorrect = true;
                 Console.WriteLine("\nCongratulations!");
             }
         }
 
+        /// <summary>
+        /// This clears the region of the console where the player inputs their guess
+        /// </summary>
+        /// <param name="numberOfEntries"> The length of the code </param>
+        /// <param name="debug"> Whether or not debug mode is active </param>
         static void ClearEntryArea(int numberOfEntries, bool debug)
         {
             int topOfSelection;
@@ -172,6 +184,9 @@ namespace mastermind_SOFT153
             Console.SetCursorPosition(0, topOfSelection);
         }
 
+        /// <summary>
+        /// Clears the whole game screen except the length and range selection
+        /// </summary>
         static void ClearAll()
         {
             int topOfSelection = 6;
