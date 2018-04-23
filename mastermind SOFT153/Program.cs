@@ -43,7 +43,7 @@ namespace mastermind_SOFT153
             do
             {
                 isCorrect = false;
-
+               
                 GenerateSecretCode(n, m, ref hiddenCode);       // Create a code to try and guess
 
                 if(debug)       // Print out the secret code
@@ -64,6 +64,8 @@ namespace mastermind_SOFT153
 
                 Console.Write("\n\nWould you like to play again? (y/n)  ");
                 restartChoice = Console.ReadLine();
+
+                ClearAll();
 
             } while (restartChoice == "y");
         }
@@ -163,6 +165,20 @@ namespace mastermind_SOFT153
             Console.SetCursorPosition(0, topOfSelection);
 
             for (int i = 0; i < numberOfEntries * 2 + 2; i++)
+            {
+                Console.Write(new string(' ', Console.WindowWidth));
+            }
+
+            Console.SetCursorPosition(0, topOfSelection);
+        }
+
+        static void ClearAll()
+        {
+            int topOfSelection = 6;
+
+            Console.SetCursorPosition(0, topOfSelection);
+
+            for (int i = 0; i < 30; i++)
             {
                 Console.Write(new string(' ', Console.WindowWidth));
             }
