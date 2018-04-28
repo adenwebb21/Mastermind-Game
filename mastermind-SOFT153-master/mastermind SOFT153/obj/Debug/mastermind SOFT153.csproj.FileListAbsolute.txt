@@ -4,3 +4,10 @@ C:\Users\awebb4\Downloads\mastermind-SOFT153-master\mastermind SOFT153\bin\Debug
 C:\Users\awebb4\Downloads\mastermind-SOFT153-master\mastermind SOFT153\obj\Debug\mastermind SOFT153.csprojResolveAssemblyReference.cache
 C:\Users\awebb4\Downloads\mastermind-SOFT153-master\mastermind SOFT153\obj\Debug\mastermind SOFT153.exe
 C:\Users\awebb4\Downloads\mastermind-SOFT153-master\mastermind SOFT153\obj\Debug\mastermind SOFT153.pdb
+C:\Users\adenw\Documents\GitHub\mastermind SOFT153\mastermind-SOFT153-master\mastermind SOFT153\bin\Debug\mastermind SOFT153.exe.config
+C:\Users\adenw\Documents\GitHub\mastermind SOFT153\mastermind-SOFT153-master\mastermind SOFT153\bin\Debug\mastermind SOFT153.exe
+C:\Users\adenw\Documents\GitHub\mastermind SOFT153\mastermind-SOFT153-master\mastermind SOFT153\bin\Debug\mastermind SOFT153.pdb
+C:\Users\adenw\Documents\GitHub\mastermind SOFT153\mastermind-SOFT153-master\mastermind SOFT153\obj\Debug\mastermind SOFT153.csprojResolveAssemblyReference.cache
+C:\Users\adenw\Documents\GitHub\mastermind SOFT153\mastermind-SOFT153-master\mastermind SOFT153\obj\Debug\mastermind SOFT153.csproj.CoreCompileInputs.cache
+C:\Users\adenw\Documents\GitHub\mastermind SOFT153\mastermind-SOFT153-master\mastermind SOFT153\obj\Debug\mastermind SOFT153.exe
+C:\Users\adenw\Documents\GitHub\mastermind SOFT153\mastermind-SOFT153-master\mastermind SOFT153\obj\Debug\mastermind SOFT153.pdb
