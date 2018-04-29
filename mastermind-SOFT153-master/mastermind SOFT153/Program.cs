@@ -6,6 +6,20 @@ using System.Threading.Tasks;
 
 namespace mastermind_SOFT153
 {
+    /// <summary>
+    /// Used to store and manage the queue used for storing the history 
+    /// </summary>
+    class queue
+    {
+        public int front = -1;      // oldest entry removed here
+        public int back = -1;       // youngest entry added here
+                                    // negative values indicate empty queue
+        public string[] data = new string[100]; 
+    }
+
+    /// <summary>
+    /// The main program - plays a mastermind game against a random code
+    /// </summary>
     class Program
     {
         /// <summary>
@@ -13,10 +27,10 @@ namespace mastermind_SOFT153
         /// </summary>
         static void Main(string[] args)
         {
-            string nInput, mInput; // n is the length and m is the range
-            int n, m;
+            string nInput, mInput;          // These are the actual text inputs    
+            int n, m;                       // n is the length and m is the range
 
-            string restartChoice;       // A letter that represents whether or not the player wishes to restart
+            string restartChoice;           // A letter that represents whether or not the player wishes to restart
 
             do
             {
@@ -26,9 +40,9 @@ namespace mastermind_SOFT153
                 Console.WriteLine("==================================================================");
 
                 Console.Write("\nPlease enter how long you would like the code to be: ");
-                nInput = Console.ReadLine(); // Retrieve the desired length of code
+                nInput = Console.ReadLine();        // Retrieve the desired length of code
 
-                while (!Int32.TryParse(nInput, out n))
+                while (!Int32.TryParse(nInput, out n))      // Error checking on the code length
                 {
                     Console.WriteLine("Not a valid number, try again.");
 
@@ -36,9 +50,9 @@ namespace mastermind_SOFT153
                 }
 
                 Console.Write("How many values would like available (standard is 6): ");
-                mInput = Console.ReadLine(); // retrieve the desired range of options
+                mInput = Console.ReadLine();        // retrieve the desired range of options
 
-                while (!Int32.TryParse(mInput, out m))
+                while (!Int32.TryParse(mInput, out m))      // Error checking on the range of values
                 {
                     Console.WriteLine("Not a valid number, try again.");
 
@@ -47,7 +61,7 @@ namespace mastermind_SOFT153
 
                 MainGameLoop(n, m);     // Enter main loop after asking user for variables
 
-                Console.Write("\n\nWould you like to play again? (y/n)  ");
+                Console.Write("Would you like to play again? (y/n)  ");
                 restartChoice = Console.ReadLine();
             }
             while (restartChoice == "y");
@@ -66,6 +80,8 @@ namespace mastermind_SOFT153
             int[] guessedCode = new int[n];     // The code being proposed by the player
             int[] hiddenCodeUnchanged = new int[n];     // The original hidden code - this allows for the restting of the code after it has been checked through
             bool debug = true;      // Whether or not debug mode is active (shows code that is being aimed for)
+
+            queue history = new queue();        // The guess history queue
 
             GenerateSecretCode(n, m, ref hiddenCode);       // Create a code to try and guess
 
@@ -86,8 +102,8 @@ namespace mastermind_SOFT153
 
             while (!isCorrect)       // While the player has not yet guessed correctly
             {
-                PlayerTurn(n, m, ref guessedCode, debug);      // Get a guess from the player
-                EvaluatePlayerTurn(guessedCode, hiddenCode, n, ref isCorrect);      // Evaluate the result
+                PlayerTurn(n, m, ref guessedCode, debug, ref history);      // Get a guess from the player
+                EvaluatePlayerTurn(guessedCode, hiddenCode, n, ref isCorrect, history);      // Evaluate the result
 
                 for (int i = 0; i < n; i++)     // Restore hidden code
                 {
@@ -118,13 +134,21 @@ namespace mastermind_SOFT153
         /// <param name="length"> length of code </param>
         /// <param name="range"> max possible value </param>
         /// <param name="emptyPlayerCode"> reference to the previously created player code </param>
-        static void PlayerTurn(int length, int range, ref int[] emptyPlayerCode, bool debug)
+        static void PlayerTurn(int length, int range, ref int[] emptyPlayerCode, bool debug, ref queue history)
         {
             string tempInput;       // Holds the value entered by the player before it is saved into the array
             int tempNum;
 
+            string stringForHistory = "";
+
+            if(!IsEmpty(history))       // Prints previous guesses
+            {
+                Console.WriteLine("\nThese are your previous guesses: ");
+                PrintQueue(history);
+            }
+            
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write("\nTime to make your guess...\n\n");
+            Console.Write("Time to make your guess...\n\n");
             Console.ResetColor();
 
             for (int i = 0; i < length; i++)        // Retrieves each number of the guess individually
@@ -136,12 +160,15 @@ namespace mastermind_SOFT153
                 {
                     Console.WriteLine("Not a valid number, try again.");
 
-                    tempInput = Console.ReadLine();
+                    tempInput = Console.ReadLine();    
                 }
 
+                stringForHistory += tempInput;
 
                 emptyPlayerCode[i] = tempNum;
             }
+
+            Add(history, stringForHistory);
         }
 
         /// <summary>
@@ -151,7 +178,7 @@ namespace mastermind_SOFT153
         /// <param name="hiddenCode"> The code that the player is trying to guess </param>
         /// <param name="n"> The length of the code </param>
         /// <param name="isCorrect"> Whether or not the current guess is correct </param>
-        static void EvaluatePlayerTurn(int[] guessedCode, int[] hiddenCode, int n, ref bool isCorrect)
+        static void EvaluatePlayerTurn(int[] guessedCode, int[] hiddenCode, int n, ref bool isCorrect, queue history)
         {
             int b = 0;      // Initialise number of each colour peg
             int w = 0;
@@ -188,55 +215,91 @@ namespace mastermind_SOFT153
             if (b == n)     // If the number of black pegs equals the length of the code, the player has won
             {
                 isCorrect = true;
-                Console.WriteLine("\nCongratulations!");
+                Console.WriteLine("\nCongratulations! This is all your guesses\n");
+                PrintQueue(history);
+
+                history = new queue();
             }
 
         }
 
-        #region Unused Methods
-        /// <summary>
-        /// This clears the region of the console where the player inputs their guess
-        /// </summary>
-        /// <param name="numberOfEntries"> The length of the code </param>
-        /// <param name="debug"> Whether or not debug mode is active </param>
-        static void ClearEntryArea(int numberOfEntries, bool debug)
-        {
-            int topOfSelection;
+        #region Queue Functions
 
-            if (debug)
+        /// <summary>
+        /// Add an element to the queue
+        /// </summary>
+        /// <param name="q"> The queue </param>
+        /// <param name="i"> The data </param>
+        static void Add(queue q, string i)
+        {
+            if (IsFull(q))
             {
-                topOfSelection = 9;
+                Console.WriteLine("ERROR -- value not stored");
             }
             else
             {
-                topOfSelection = 6;
+                if (IsEmpty(q))
+                {
+
+                    q.front = q.back = 0;
+                    q.data[q.front] = i;
+
+                }
+                else
+                {
+                    if (q.back == 99) // no place left at end 
+                        q.back = -1; // cycle around
+
+                    q.back = q.back + 1;
+                    q.data[q.back] = i;
+                }
             }
-
-            Console.SetCursorPosition(0, topOfSelection);
-
-            for (int i = 0; i < numberOfEntries * 2 + 2; i++)
-            {
-                Console.Write(new string(' ', Console.WindowWidth));
-            }
-
-            Console.SetCursorPosition(0, topOfSelection);
         }
 
-        /// <summary>
-        /// Clears the whole game screen except the length and range selection
-        /// </summary>
-        static void ClearAll()
+        static bool IsFull(queue q)
         {
-            int topOfSelection = 6;
 
-            Console.SetCursorPosition(0, topOfSelection);
+            return ((q.front == q.back + 1) ||
+                ((q.front == 0) && (q.back == 9)));
+        }
 
-            for (int i = 0; i < 30; i++)
+        static bool IsEmpty(queue q)
+        {
+            return (q.front == -1);
+        }
+
+
+        static string Front(queue q)
+        {
+            return (q.data[q.front]);
+        }
+
+        static string Back(queue q)
+        {
+            return (q.data[q.back]);
+        }
+
+        static int Size(queue q)
+        {
+            return (1 + (100 + q.back - q.front) % 100);
+        }
+
+        static void PrintQueue(queue q)
+        {
+            int i, len = Size(q);
+
+            if (IsEmpty(q))
             {
-                Console.Write(new string(' ', Console.WindowWidth));
+                Console.WriteLine("Queue is empty; nothing to print");
+                return;
             }
 
-            Console.SetCursorPosition(0, topOfSelection);
+            for (i = 0; i < len; i++)
+                Console.Write(q.data[(q.front + i) % 10] + "\n");
+            // modulo operator '%' wraps back into the right array index range
+
+            Console.WriteLine();
+            //Console.WriteLine("front = " + q.front + ";   back = " + q.back);
         }
 
         #endregion
